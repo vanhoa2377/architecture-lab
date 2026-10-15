@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Architecture Lab</title>
+</head>
+
+<body>
+    <h1>Công việc của Hurk</h1>
+    <button id="load-button">Tải công việc</button>
+    <p id="status"></p>
+    <ul id="task-list"></ul>
+
+    <script>
+        const button = document.querySelector("#load-button");
+        const status = document.querySelector("#status");
+        const list = document.querySelector("#task-list");
+
+        button.addEventListener("click", async () => {
+            button.disabled = true;
+            status.textContent = "Đang tải...";
+
+            try {
+                const response = await fetch("/api/tasks");
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const tasks = await response.json();
+
+                list.replaceChildren();
+
+                for (const task of tasks) {
+                    const item = document.createElement("li");
+                    item.textContent = task.title;
+                    list.appendChild(item);
+                }
+
+                status.textContent = `Đã tải ${tasks.length} công việc`;
+            } catch (error) {
+                status.textContent = `Tải thất bại: ${error.message}`;
+            } finally {
+                button.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
